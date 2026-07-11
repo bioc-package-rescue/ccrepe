@@ -12,7 +12,13 @@ test.nc.score <- function()
     }
     expect_warning <- function(expr) {
         warn <- FALSE
-        tryCatch(expr, warning = function(w) warn <<- TRUE)
+        withCallingHandlers(
+            expr,
+            warning = function(w) {
+                warn <<- TRUE
+                invokeRestart("muffleWarning")
+            }
+        )
         checkTrue(warn, "Expected a warning but none was thrown.")
     }
 	
