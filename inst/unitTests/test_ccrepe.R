@@ -1,28 +1,4 @@
 library(testthat)
-find_expr <- function(name, env = parent.frame()) {
-      subs <- do.call("substitute", list(as.name(name), env))
-        paste0(deparse(subs, width.cutoff = 500), collapse = "\n")
-  }
-
-is_approximately <- function(expected,tol=10e-7,label=NULL)
-{
-      if (is.null(label)) {
-              label <- find_expr("expected")
-          } else if (!is.character(label) || length(label) != 1) {
-                  label <- deparse(label)
-              }
-      
-    function(actual)
-        {
-            same <- all.equal.numeric(as.vector(actual),as.vector(expected),tol=tol)
-
-            expectation(
-                 "success",
-                identical(same,TRUE),
-                paste0("not equal to ", label, " within tolerance ",tol,"\n", same)
-                )
-        }
-}
 
 testdata<-matrix(c(0.29787234, 0.2978723, 0.2553191, 0.1489362,
 		0.17073171, 0.3170732, 0.2682927, 0.2439024,
@@ -74,10 +50,11 @@ z.stat.results <-matrix(c( NA,  0.4352228,  0.7337243, -1.8029587,
 
  
 
-expect_that(p.values.results,is_approximately(ccrepe.results$p.values, tol))
-expect_that(q.values.results,is_approximately(ccrepe.results$q.values,tol))
-expect_that(sim.score.results,is_approximately(ccrepe.results$sim.score, tol))
-expect_that(z.stat.results,is_approximately(ccrepe.results$z.stat, tol))
+expect_equal(as.vector(ccrepe.results$p.values), as.vector(p.values.results), tolerance = tol, ignore_attr = TRUE)
+expect_equal(as.vector(ccrepe.results$q.values), as.vector(q.values.results), tolerance = tol, ignore_attr = TRUE)
+expect_equal(as.vector(ccrepe.results$sim.score), as.vector(sim.score.results), tolerance = tol, ignore_attr = TRUE)
+expect_equal(as.vector(ccrepe.results$z.stat), as.vector(z.stat.results), tolerance = tol, ignore_attr = TRUE)
+
 
 
 
