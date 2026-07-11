@@ -6,6 +6,15 @@ test.nc.score <- function()
 {
     library(RUnit)
     library(infotheo)
+    context <- function(...) invisible(NULL)
+    expect_error <- function(expr) {
+        checkException(expr)
+    }
+    expect_warning <- function(expr) {
+        warn <- FALSE
+        tryCatch(expr, warning = function(w) warn <<- TRUE)
+        checkTrue(warn, "Expected a warning but none was thrown.")
+    }
 	
 	data <- read.table("nc_score_input_test.txt",header=TRUE,row.names=1)
 	
