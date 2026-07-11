@@ -1,0 +1,102 @@
+---
+title: "CCREPE: Compositionality Corrected by PErmutation and REnormalization"
+author: "Emma Schwager, George Weingart, Craig Bielski, Curtis Huttenhower"
+date: "`r Sys.Date()`"
+output: BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{ccrepe}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+
+`ccrepe` is a package for analysis of sparse compositional data. Specifically, it determines the significance of association between features in a composition, using any similarity measure (e.g. Pearson correlation, Spearman correlation, etc.) The CCREPE methodology stands for Compositionality Corrected by Renormalization and Permutation. The package also provides a novel similarity measure, the N-dimensional checkerboard score (NC-score), particularly appropriate to compositions binned from continuous data.
+
+# ccrepe
+
+`ccrepe` is the main package function. It calculates compositionality-corrected p-values and q-values for a user-selected similarity measure, operating on either one or two input matrices.
+
+## Example 1
+
+An example of how to use `ccrepe` with one dataset.
+
+```{r example1}
+library(ccrepe)
+data <- matrix(rlnorm(40,meanlog=0,sdlog=1),nrow=10,ncol=4)
+data[,1] = 2*data[,2] + rnorm(10,0,0.01)
+data.rowsum <- apply(data,1,sum)
+data.norm <- data/data.rowsum
+
+test.input <- data.norm
+dimnames(test.input) <- list(c(
+ "Sample 1", "Sample 2","Sample 3","Sample 4","Sample 5",
+ "Sample 6","Sample 7","Sample 8","Sample 9","Sample 10"),
+ c("Feature 1", "Feature 2", "Feature 3","Feature 4"))
+
+test.output <- ccrepe(x=test.input, iterations=20, min.subj=10)
+
+par(mfrow=c(1,2))
+plot(data[,1],data[,2],xlab="Feature 1",ylab="Feature 2",main="Non-normalized")
+plot(data.norm[,1],data.norm[,2],xlab="Feature 1",ylab="Feature 2",
+     main="Normalized")
+test.output
+```
+
+## Example 2
+
+An example of how to use `ccrepe` with two datasets.
+
+```{r example2}
+data2 <- matrix(rlnorm(105,meanlog=0,sdlog=1),nrow=15,ncol=7)
+aligned.rows <- c(seq(1,4),seq(6,9),11,12)
+data2[aligned.rows,1] <-  2*data[,3] + rnorm(10,0,0.01)
+data2.rowsum <- apply(data2,1,sum)
+data2.norm <- data2/data2.rowsum
+test.input.2 <- data2.norm
+
+dimnames(test.input) <- list(paste("Sample",seq(1,10)),paste("Feature",seq(1,4)))
+dimnames(test.input.2) <- list(paste("Sample",c(seq(1,4),11,seq(5,8),12,9,10,13,14,15)),paste("Feature",seq(1,7)))
+
+test.output.two.datasets <- ccrepe(x=test.input, y=test.input.2, iterations=20, min.subj=10)
+
+par(mfrow=c(1,2))
+plot(data2[aligned.rows,1],data[,3],xlab="dataset 2: Feature 1",ylab="dataset 1: Feature 3",main="Non-normalized")
+plot(data2.norm[aligned.rows,1],data.norm[,3],xlab="dataset 2: Feature 1",ylab="dataset 1: Feature 3",
+     main="Normalized")
+test.output.two.datasets
+```
+
+## Example 3
+
+An example of how to use `ccrepe` with `nc.score` as the similarity score.
+
+```{r example3}
+test.output.nc.score <- ccrepe(x=test.input, sim.score=nc.score, iterations=20, min.subj=10)
+
+par(mfrow=c(1,2))
+plot(data[,1],data[,2],xlab="Feature 1",ylab="Feature 2",main="Non-normalized")
+plot(data.norm[,1],data.norm[,2],xlab="Feature 1",ylab="Feature 2",
+     main="Normalized")
+test.output.nc.score
+```
+
+# nc.score
+
+The `nc.score` similarity measure is an N-dimensional extension of the checkerboard score suited to ecological relative abundance measurements.
+
+## Example 1
+
+An example of using `nc.score` to get a single similarity score or a matrix.
+
+```{r nc_example1}
+test.output.matrix <- nc.score(x=test.input)
+test.output.num    <- nc.score(x=test.input[,1],y=test.input[,2])
+
+par(mfrow=c(1, 2))
+plot(data[,1],data[,2],xlab="Feature 1",ylab="Feature 2",main="Non-normalized")
+plot(data.norm[,1],data.norm[,2],xlab="Feature 1",ylab="Feature 2",
+     main="Normalized")
+test.output.matrix
+test.output.num
+```

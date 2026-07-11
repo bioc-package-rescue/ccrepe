@@ -1,7 +1,7 @@
 Package: ccrepe
 Type: Package
 Title: ccrepe_and_nc.score
-Version: 1.49.0
+Version: 1.49.1
 Imports: infotheo (>= 1.1)
 Date: 2024-02-06
 Author: Emma Schwager <emh146@mail.harvard.edu>,Craig Bielski<craig.bielski@gmail.com>, George Weingart<george.weingart@gmail.com>
@@ -11,6 +11,6 @@ Description: The CCREPE (Compositionality Corrected by REnormalizaion and PErmut
  nc.score:  Calculates species-level co-variation and co-exclusion patterns based on an extension of the checkerboard score to ordinal data.
 License: MIT + file LICENSE
 VignetteBuilder: knitr
-Suggests: knitr, BiocStyle, BiocGenerics, testthat, RUnit
+Suggests: knitr, BiocStyle, BiocGenerics, testthat, RUnit, rmarkdown
 biocViews: ImmunoOncology, Statistics, Metagenomics, Bioinformatics, Software
 PackageStatus: Deprecated
